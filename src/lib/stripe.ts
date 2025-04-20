@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import Stripe from "stripe";
+import { Stripe } from "stripe";
 import { BadRequestError } from "../http/routes/_errors/bad-request-error";
 
 dotenv.config();
