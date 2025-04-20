@@ -1,18 +1,18 @@
-import { fastify } from "fastify";
 import { fastifyCors } from "@fastify/cors";
+import { fastifySwagger } from "@fastify/swagger";
+import { fastifySwaggerUi } from "@fastify/swagger-ui";
+import { fastify } from "fastify";
 import {
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { fastifySwagger } from "@fastify/swagger";
-import { fastifySwaggerUi } from "@fastify/swagger-ui";
-import { webhook } from "./routes/webhook";
 import { checkSubscription } from "./routes/check-subscription";
 import { createCheckoutSession } from "./routes/create-checkout-session";
-import { syncCustomerEmail } from "./routes/sync-customer-email";
 import { healthRoutes } from "./routes/health";
+import { syncCustomerEmail } from "./routes/sync-customer-email";
+import { webhook } from "./routes/webhook";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 

@@ -1,7 +1,7 @@
 import z from "zod";
-import { FastifyTypedInstance } from "../../types";
 import { stripe } from "../../lib/stripe";
 import { supabase } from "../../lib/supabase";
+import { FastifyTypedInstance } from "../../types";
 import { BadRequestError } from "./_errors/bad-request-error";
 
 export async function createCheckoutSession(app: FastifyTypedInstance) {

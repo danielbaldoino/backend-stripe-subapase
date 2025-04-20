@@ -1,11 +1,11 @@
 import z from "zod";
-import { FastifyTypedInstance } from "../../types";
-import { supabase } from "../../lib/supabase";
 import { stripe } from "../../lib/stripe";
+import { supabase } from "../../lib/supabase";
+import { FastifyTypedInstance } from "../../types";
 
 export async function checkSubscription(app: FastifyTypedInstance) {
   app.get(
-    "check-subscription/:userId",
+    "/check-subscription/:userId",
     {
       schema: {
         params: z.object({
