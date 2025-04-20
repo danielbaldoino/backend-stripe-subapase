@@ -2,6 +2,7 @@ import { fastifyCors } from "@fastify/cors";
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifySwaggerUi } from "@fastify/swagger-ui";
 import { fastify } from "fastify";
+import { fastifyRawBody } from "fastify-raw-body";
 import {
   jsonSchemaTransform,
   serializerCompiler,
@@ -33,6 +34,13 @@ app.register(fastifySwagger, {
 
 app.register(fastifySwaggerUi, {
   routePrefix: "/docs",
+});
+
+ app.register(fastifyRawBody, {
+  field: 'rawBody',
+  global: false, 
+  encoding: 'utf8',
+  runFirst: true
 });
 
 app.register(checkSubscription);

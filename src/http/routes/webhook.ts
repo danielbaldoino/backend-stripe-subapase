@@ -8,6 +8,7 @@ export async function webhook(app: FastifyTypedInstance) {
   app.post(
     "/webhook",
     {
+      config: { rawBody: true },
       schema: {
         headers: z.object({
           "stripe-signature": z.string(),
@@ -21,8 +22,10 @@ export async function webhook(app: FastifyTypedInstance) {
     async (request, reply) => {
       const {
         headers: { "stripe-signature": signature },
-        body: payload,
+        rawBody: payload,
       } = request;
+
+      if (!payload) throw new BadRequestError("Missing raw body");
 
       const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -32,7 +35,7 @@ export async function webhook(app: FastifyTypedInstance) {
         );
 
       const event = stripe.webhooks.constructEvent(
-        JSON.stringify(payload),
+        payload,
         signature,
         webhookSecret
       );
@@ -44,7 +47,6 @@ export async function webhook(app: FastifyTypedInstance) {
             console.log("Payment was successful!");
 
             await handleSuccessfulPayment(event.data.object);
-
           } else if (
             event.data.object.payment_status === "unpaid" &&
             event.data.object.payment_intent
@@ -89,9 +91,9 @@ const handleSuccessfulPayment = async (session: any) => {
   const customerId = session.customer;
 
   await supabase
-  .from("profiles")
-  .update({
-    stripe_customer_id: customerId,
-  })
-  .eq("uuid", userId);
+    .from("profiles")
+    .update({
+      stripe_customer_id: customerId,
+    })
+    .eq("uuid", userId);
 };
