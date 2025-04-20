@@ -12,7 +12,7 @@ export async function webhook(app: FastifyTypedInstance) {
         headers: z.object({
           "stripe-signature": z.string(),
         }),
-        body: z.any(),
+        body: z.string(),
         response: {
           200: z.string(),
         },
@@ -32,7 +32,7 @@ export async function webhook(app: FastifyTypedInstance) {
         );
 
       const event = stripe.webhooks.constructEvent(
-        payload as Buffer,
+        payload,
         signature,
         webhookSecret
       );
