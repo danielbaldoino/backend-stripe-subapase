@@ -22,11 +22,11 @@ export async function checkSubscription(app: FastifyTypedInstance) {
       const { userId } = request.params;
 
       const customerId = await supabase
-        .schema("public")
         .from("profiles")
         .select("stripe_customer_id")
-        .eq("id", userId)
-        .then(({ data }) => data?.[0]?.stripe_customer_id);
+        .eq("uuid", userId)
+        .single()
+        .then(({ data }) => data?.stripe_customer_id);
 
       if (!customerId) return { subscriptionStatus: "inactive" };
 

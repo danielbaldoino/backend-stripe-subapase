@@ -20,21 +20,16 @@ export async function syncCustomerEmail(app: FastifyTypedInstance) {
     async (request, reply) => {
       const { userId } = request.body;
 
-      const email = await supabase
-        .schema("auth")
-        .from("users")
-        .select("email")
-        .eq("id", userId)
-        .single()
-        .then(({ data }) => data?.email);
+      const email = await supabase.auth.admin
+        .getUserById(userId)
+        .then(({ data }) => data.user?.email);
 
       if (!email) throw new BadRequestError("Failed to update user email");
 
       const customerId = await supabase
-        .schema("public")
         .from("profiles")
         .select("stripe_customer_id")
-        .eq("id", userId)
+        .eq("uuid", userId)
         .single()
         .then(({ data }) => data?.stripe_customer_id);
 

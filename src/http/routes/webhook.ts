@@ -89,10 +89,9 @@ const handleSuccessfulPayment = async (session: any) => {
   const customerId = session.customer;
 
   await supabase
-  .schema("public")
   .from("profiles")
   .update({
     stripe_customer_id: customerId,
   })
-  .eq("id", userId);
+  .eq("uuid", userId);
 };
