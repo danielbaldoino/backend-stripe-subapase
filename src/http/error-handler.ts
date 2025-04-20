@@ -25,7 +25,7 @@ export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
     });
   }
 
-  console.error(error);
+  console.error("Error:", error);
 
   reply.status(500).send({ message: "Internal server error" });
 };

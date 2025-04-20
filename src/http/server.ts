@@ -12,6 +12,7 @@ import { webhook } from "./routes/webhook";
 import { checkSubscription } from "./routes/check-subscription";
 import { createCheckoutSession } from "./routes/create-checkout-session";
 import { syncCustomerEmail } from "./routes/sync-customer-email";
+import { healthRoutes } from "./routes/health";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -38,6 +39,7 @@ app.register(checkSubscription);
 app.register(createCheckoutSession);
 app.register(syncCustomerEmail);
 app.register(webhook);
+app.register(healthRoutes);
 
 app.listen({ port: 3333 }).then(() => {
   console.log("HTTP server running!");

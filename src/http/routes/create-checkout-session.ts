@@ -23,8 +23,6 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
     async (request, reply) => {
       const { priceId, userId } = request.body;
 
-      console.log(request.headers.origin);
-
       const customerId = await supabase
         .schema("public")
         .from("profiles")
