@@ -2,15 +2,14 @@ import z from "zod";
 import { stripe } from "../../lib/stripe";
 import { supabase } from "../../lib/supabase";
 import { FastifyTypedInstance } from "../../types";
+import { auth } from "../middlewares/auth";
 
 export async function checkSubscription(app: FastifyTypedInstance) {
-  app.get(
-    "/check-subscription/:userId",
+  app.register(auth).get(
+    "/check-subscription",
     {
       schema: {
-        params: z.object({
-          userId: z.string(),
-        }),
+        security: [{ bearerAuth: [] }],
         response: {
           200: z.object({
             subscriptionStatus: z.string(),
@@ -18,8 +17,8 @@ export async function checkSubscription(app: FastifyTypedInstance) {
         },
       },
     },
-    async (request, reply) => {
-      const { userId } = request.params;
+    async (request) => {
+      const { id: userId } = await request.getAuthenticatedUser();
 
       const customerId = await supabase
         .from("profiles")

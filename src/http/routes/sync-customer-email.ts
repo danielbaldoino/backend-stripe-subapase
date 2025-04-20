@@ -2,29 +2,22 @@ import z from "zod";
 import { stripe } from "../../lib/stripe";
 import { supabase } from "../../lib/supabase";
 import { FastifyTypedInstance } from "../../types";
+import { auth } from "../middlewares/auth";
 import { BadRequestError } from "./_errors/bad-request-error";
 
 export async function syncCustomerEmail(app: FastifyTypedInstance) {
-  app.patch(
+  app.register(auth).patch(
     "/sync-customer-email",
     {
       schema: {
-        body: z.object({
-          userId: z.string(),
-        }),
+        security: [{ bearerAuth: [] }],
         response: {
           204: z.null(),
         },
       },
     },
     async (request, reply) => {
-      const { userId } = request.body;
-
-      const email = await supabase.auth.admin
-        .getUserById(userId)
-        .then(({ data }) => data.user?.email);
-
-      if (!email) throw new BadRequestError("Failed to update user email");
+      const { id: userId, email } = await request.getAuthenticatedUser();
 
       const customerId = await supabase
         .from("profiles")
@@ -33,14 +26,13 @@ export async function syncCustomerEmail(app: FastifyTypedInstance) {
         .single()
         .then(({ data }) => data?.stripe_customer_id);
 
-      if (email && customerId) {
+      if (customerId) {
         const customer = await stripe.customers.update(customerId, {
           email,
         });
 
-        if (!customer) {
+        if (!customer)
           throw new BadRequestError("Failed to update customer email");
-        }
       }
 
       return reply.status(204).send();

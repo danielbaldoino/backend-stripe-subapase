@@ -8,7 +8,9 @@ export async function webhook(app: FastifyTypedInstance) {
   app.post(
     "/webhook",
     {
-      config: { rawBody: true },
+      config: {
+        rawBody: true,
+      },
       schema: {
         headers: z.object({
           "stripe-signature": z.string(),
@@ -19,7 +21,7 @@ export async function webhook(app: FastifyTypedInstance) {
         },
       },
     },
-    async (request, reply) => {
+    async (request) => {
       const {
         headers: { "stripe-signature": signature },
         rawBody: payload,
@@ -92,8 +94,6 @@ const handleSuccessfulPayment = async (session: any) => {
 
   await supabase
     .from("profiles")
-    .update({
-      stripe_customer_id: customerId,
-    })
+    .update({ stripe_customer_id: customerId })
     .eq("uuid", userId);
 };

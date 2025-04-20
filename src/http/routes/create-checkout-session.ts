@@ -2,16 +2,17 @@ import z from "zod";
 import { stripe } from "../../lib/stripe";
 import { supabase } from "../../lib/supabase";
 import { FastifyTypedInstance } from "../../types";
-import { BadRequestError } from "./_errors/bad-request-error";
+import { auth } from "../middlewares/auth";
 
 export async function createCheckoutSession(app: FastifyTypedInstance) {
-  app.post(
+  app.register(auth).post(
     "/create-checkout-session",
     {
       schema: {
+        security: [{ bearerAuth: [] }],
         body: z.object({
           priceId: z.string(),
-          userId: z.string(),
+          callbackUrl: z.string().url(),
         }),
         response: {
           200: z.object({
@@ -20,14 +21,10 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
         },
       },
     },
-    async (request, reply) => {
-      const { priceId, userId } = request.body;
+    async (request) => {
+      const { id: userId, email } = await request.getAuthenticatedUser();
 
-      const email = await supabase.auth.admin
-        .getUserById(userId)
-        .then(({ data }) => data.user?.email);
-
-      if (!email) throw new BadRequestError("Failed to retrieve user email");
+      const { priceId, callbackUrl } = request.body;
 
       const customerId = await supabase
         .from("profiles")
@@ -38,15 +35,15 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
 
       const checkoutSession = await stripe.checkout.sessions.create({
         mode: "subscription",
-        payment_method_types: ["card", "boleto"],
+        payment_method_types: ["card", "boleto", "pix"],
         line_items: [
           {
             price: priceId,
             quantity: 1,
           },
         ],
-        success_url: `${process.env.FRONTEND_URL}`,
-        cancel_url: `${process.env.FRONTEND_URL}`,
+        success_url: `${callbackUrl}/success`,
+        cancel_url: `${callbackUrl}/cancel`,
         client_reference_id: userId,
         customer: customerId || undefined,
         customer_email: customerId || email,
