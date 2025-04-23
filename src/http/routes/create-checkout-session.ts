@@ -35,7 +35,7 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
 
       const checkoutSession = await stripe.checkout.sessions.create({
         mode: "subscription",
-        payment_method_types: ["card", "boleto", "pix"],
+        payment_method_types: ["card", "boleto"],
         line_items: [
           {
             price: priceId,
