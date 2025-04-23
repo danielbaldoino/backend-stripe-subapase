@@ -46,7 +46,7 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
         cancel_url: `${callbackUrl}/cancel`,
         client_reference_id: userId,
         customer: customerId || undefined,
-        customer_email: customerId || email,
+        customer_email: customerId ? undefined : email,
       });
 
       return {
