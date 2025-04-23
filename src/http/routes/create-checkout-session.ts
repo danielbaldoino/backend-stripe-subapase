@@ -43,7 +43,7 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
           },
         ],
         success_url: `${callbackUrl}/success`,
-        cancel_url: `${callbackUrl}/cancel`,
+        cancel_url: `${process.env.URL_SCHEME ?? callbackUrl}/cancel`,
         client_reference_id: userId,
         customer: customerId || undefined,
         customer_email: customerId ? undefined : email,
