@@ -3,6 +3,7 @@ import { stripe } from "../../lib/stripe";
 import { supabase } from "../../lib/supabase";
 import { FastifyTypedInstance } from "../../types";
 import { auth } from "../middlewares/auth";
+import { BadRequestError } from "./_errors/bad-request-error";
 
 export async function createCheckoutSession(app: FastifyTypedInstance) {
   app.register(auth).post(
@@ -12,7 +13,6 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
         security: [{ bearerAuth: [] }],
         body: z.object({
           priceId: z.string(),
-          callbackUrl: z.string().url(),
         }),
         response: {
           200: z.object({
@@ -24,7 +24,11 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
     async (request) => {
       const { id: userId, email } = await request.getAuthenticatedUser();
 
-      const { priceId, callbackUrl } = request.body;
+      const successUrl = process.env.SUCCESS_URL;
+
+      if (!successUrl) throw new BadRequestError("Missing success URL");
+
+      const { priceId } = request.body;
 
       const customerId = await supabase
         .from("profiles")
@@ -42,7 +46,7 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
             quantity: 1,
           },
         ],
-        success_url: process.env.SUCCESS_URL,
+        success_url: successUrl,
         client_reference_id: userId,
         customer: customerId || undefined,
         customer_email: customerId ? undefined : email,
