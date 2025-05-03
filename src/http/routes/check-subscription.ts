@@ -23,7 +23,7 @@ export async function checkSubscription(app: FastifyTypedInstance) {
       const customerId = await supabase
         .from("profiles")
         .select("stripe_customer_id")
-        .eq("uuid", userId)
+        .eq("id", userId)
         .single()
         .then(({ data }) => data?.stripe_customer_id);
 

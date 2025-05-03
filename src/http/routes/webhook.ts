@@ -95,5 +95,5 @@ const handleSuccessfulPayment = async (session: any) => {
   await supabase
     .from("profiles")
     .update({ stripe_customer_id: customerId })
-    .eq("uuid", userId);
+    .eq("id", userId);
 };
