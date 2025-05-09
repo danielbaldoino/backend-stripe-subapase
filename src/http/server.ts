@@ -9,7 +9,7 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { checkSubscription } from "./routes/check-subscription";
+import { activeSubscription } from "./routes/active-subscription";
 import { createCheckoutSession } from "./routes/create-checkout-session";
 import { healthRoutes } from "./routes/health";
 import { syncCustomerEmail } from "./routes/sync-customer-email";
@@ -53,7 +53,7 @@ app.register(fastifySwaggerUi, {
   runFirst: true
 });
 
-app.register(checkSubscription);
+app.register(activeSubscription);
 app.register(createCheckoutSession);
 app.register(billingPortalSession);
 app.register(syncCustomerEmail);
