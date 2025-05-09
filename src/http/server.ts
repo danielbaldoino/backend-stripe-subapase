@@ -14,6 +14,7 @@ import { createCheckoutSession } from "./routes/create-checkout-session";
 import { healthRoutes } from "./routes/health";
 import { syncCustomerEmail } from "./routes/sync-customer-email";
 import { webhook } from "./routes/webhook";
+import { billingPortalSession } from "./routes/billing-portal-session";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -54,6 +55,7 @@ app.register(fastifySwaggerUi, {
 
 app.register(checkSubscription);
 app.register(createCheckoutSession);
+app.register(billingPortalSession);
 app.register(syncCustomerEmail);
 app.register(webhook);
 app.register(healthRoutes);
