@@ -15,8 +15,6 @@ export const auth = fastifyPlugin(async (app: FastifyInstance) => {
 
       const token = authHeader.split(" ")[1];
 
-      console.log("Token:", token);
-
       const {
         data: { user },
         error,
