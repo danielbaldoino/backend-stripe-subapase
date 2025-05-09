@@ -12,7 +12,7 @@ export async function billingPortalSession(app: FastifyTypedInstance) {
         security: [{ bearerAuth: [] }],
         response: {
           200: z.object({
-            url: z.string(),
+            portalUrl: z.string(),
           }),
         },
       },
@@ -27,7 +27,7 @@ export async function billingPortalSession(app: FastifyTypedInstance) {
       });
 
       return {
-        url: session.url,
+        portalUrl: session.url,
       };
     }
   );
