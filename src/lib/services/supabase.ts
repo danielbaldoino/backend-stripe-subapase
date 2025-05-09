@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
-import { BadRequestError } from "../http/routes/_errors/bad-request-error";
+import { BadRequestError } from "../../http/routes/_errors/bad-request-error";
 
 dotenv.config();
 

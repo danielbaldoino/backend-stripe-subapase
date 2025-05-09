@@ -1,9 +1,8 @@
-import z from "zod";
-import { stripe } from "../../lib/stripe";
-import { FastifyTypedInstance } from "../../types";
 import Stripe from "stripe";
+import z from "zod";
+import { stripe } from "../../lib/services/stripe";
+import { FastifyTypedInstance } from "../../types";
 import { auth } from "../middlewares/auth";
-import { supabase } from "../../lib/supabase";
 import { BadRequestError } from "./_errors/bad-request-error";
 
 type SubscriptionWithPlan = Stripe.Subscription & {
@@ -33,14 +32,7 @@ export async function activeSubscription(app: FastifyTypedInstance) {
       },
     },
     async (request) => {
-      const { id: userId } = await request.getAuthenticatedUser();
-
-      const customerId = await supabase
-        .from("profiles")
-        .select("stripe_customer_id")
-        .eq("id", userId)
-        .single()
-        .then(({ data }) => data?.stripe_customer_id);
+      const { customerId } = await request.getAuthenticatedUser();
 
       const {
         data: [subscription],
@@ -51,9 +43,8 @@ export async function activeSubscription(app: FastifyTypedInstance) {
         limit: 1,
       });
 
-      if (!subscription) {
+      if (!subscription)
         throw new BadRequestError("No active subscription found");
-      }
 
       const plan = (subscription as SubscriptionWithPlan).plan;
 

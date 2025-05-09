@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { fastifyPlugin } from "fastify-plugin";
 
-import { supabase } from "../../lib/supabase";
+import { getCustomerIdByUserId } from "../../lib/db/repository";
+import { supabase } from "../../lib/services/supabase";
 import { UnauthorizedError } from "../routes/_errors/unauthorized-error";
 
 export const auth = fastifyPlugin(async (app: FastifyInstance) => {
@@ -14,12 +15,21 @@ export const auth = fastifyPlugin(async (app: FastifyInstance) => {
 
       const token = authHeader.split(" ")[1];
 
-      const { data, error } = await supabase.auth.getUser(token);
+      console.log("Token:", token);
 
-      if (error || !data)
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser(token);
+
+      if (error || !user)
         throw new UnauthorizedError("Invalid or expired token");
 
-      return data.user;
+      return {
+        userId: user.id,
+        email: user.email as string,
+        customerId: await getCustomerIdByUserId(user.id),
+      };
     };
   });
 });

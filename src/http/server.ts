@@ -10,11 +10,11 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { activeSubscription } from "./routes/active-subscription";
+import { billingPortalSession } from "./routes/billing-portal-session";
 import { createCheckoutSession } from "./routes/create-checkout-session";
 import { healthRoutes } from "./routes/health";
 import { syncCustomerEmail } from "./routes/sync-customer-email";
 import { webhook } from "./routes/webhook";
-import { billingPortalSession } from "./routes/billing-portal-session";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -32,9 +32,9 @@ app.register(fastifySwagger, {
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
         },
       },
     },
@@ -46,11 +46,11 @@ app.register(fastifySwaggerUi, {
   routePrefix: "/docs",
 });
 
- app.register(fastifyRawBody, {
-  field: 'rawBody',
-  global: false, 
-  encoding: 'utf8',
-  runFirst: true
+app.register(fastifyRawBody, {
+  field: "rawBody",
+  global: false,
+  encoding: "utf8",
+  runFirst: true,
 });
 
 app.register(activeSubscription);

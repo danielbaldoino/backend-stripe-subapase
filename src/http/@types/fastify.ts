@@ -1,8 +1,11 @@
-import { User } from '@supabase/supabase-js'
-import 'fastify'
+import "fastify";
 
-declare module 'fastify' {
+declare module "fastify" {
   export interface FastifyRequest {
-    getAuthenticatedUser(): Promise<User>
+    getAuthenticatedUser(): Promise<{
+      userId: string;
+      email: string;
+      customerId?: string;
+    }>;
   }
 }

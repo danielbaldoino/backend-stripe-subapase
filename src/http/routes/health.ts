@@ -1,5 +1,6 @@
-import { stripe } from "../../lib/stripe";
-import { supabase } from "../../lib/supabase";
+
+import { stripe } from "../../lib/services/stripe";
+import { supabase } from "../../lib/services/supabase";
 import { FastifyTypedInstance } from "../../types";
 
 export async function healthRoutes(app: FastifyTypedInstance) {

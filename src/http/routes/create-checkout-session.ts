@@ -1,6 +1,5 @@
 import z from "zod";
-import { stripe } from "../../lib/stripe";
-import { supabase } from "../../lib/supabase";
+import { stripe } from "../../lib/services/stripe";
 import { FastifyTypedInstance } from "../../types";
 import { auth } from "../middlewares/auth";
 import { BadRequestError } from "./_errors/bad-request-error";
@@ -22,20 +21,14 @@ export async function createCheckoutSession(app: FastifyTypedInstance) {
       },
     },
     async (request) => {
-      const { id: userId, email } = await request.getAuthenticatedUser();
+      const { userId, email, customerId } =
+        await request.getAuthenticatedUser();
 
       const successUrl = process.env.SUCCESS_URL;
 
       if (!successUrl) throw new BadRequestError("Missing success URL");
 
       const { priceId } = request.body;
-
-      const customerId = await supabase
-        .from("profiles")
-        .select("stripe_customer_id")
-        .eq("id", userId)
-        .single()
-        .then(({ data }) => data?.stripe_customer_id);
 
       const checkoutSession = await stripe.checkout.sessions.create({
         mode: "subscription",

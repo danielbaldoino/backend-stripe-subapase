@@ -1,6 +1,7 @@
+import Stripe from "stripe";
 import z from "zod";
-import { stripe } from "../../lib/stripe";
-import { supabase } from "../../lib/supabase";
+import { setCustomerId } from "../../lib/db/repository";
+import { stripe } from "../../lib/services/stripe";
 import { FastifyTypedInstance } from "../../types";
 import { BadRequestError } from "./_errors/bad-request-error";
 
@@ -42,13 +43,21 @@ export async function webhook(app: FastifyTypedInstance) {
         webhookSecret
       );
 
+      const handleSuccessfulPayment = async () => {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await setCustomerId(
+          session.client_reference_id as string,
+          session.customer as string
+        );
+      };
+
       switch (event.type) {
         case "checkout.session.completed":
           if (event.data.object.payment_status === "paid") {
             // Handle successful payment
             console.log("Payment was successful!");
 
-            await handleSuccessfulPayment(event.data.object);
+            await handleSuccessfulPayment();
           } else if (
             event.data.object.payment_status === "unpaid" &&
             event.data.object.payment_intent
@@ -68,7 +77,7 @@ export async function webhook(app: FastifyTypedInstance) {
             // Handle successful payment
             console.log("Payment was successful!");
 
-            await handleSuccessfulPayment(event.data.object);
+            await handleSuccessfulPayment();
           }
           break;
         case "checkout.session.async_payment_failed":
@@ -87,13 +96,3 @@ export async function webhook(app: FastifyTypedInstance) {
     }
   );
 }
-
-const handleSuccessfulPayment = async (session: any) => {
-  const userId = session.client_reference_id;
-  const customerId = session.customer;
-
-  await supabase
-    .from("profiles")
-    .update({ stripe_customer_id: customerId })
-    .eq("id", userId);
-};
