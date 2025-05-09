@@ -6,6 +6,10 @@ import { auth } from "../middlewares/auth";
 import { supabase } from "../../lib/supabase";
 import { BadRequestError } from "./_errors/bad-request-error";
 
+type SubscriptionWithPlan = Stripe.Subscription & {
+  plan: Stripe.Plan & { product: Stripe.Product };
+};
+
 export async function activeSubscription(app: FastifyTypedInstance) {
   app.register(auth).get(
     "/active-subscription",
@@ -47,12 +51,11 @@ export async function activeSubscription(app: FastifyTypedInstance) {
         limit: 1,
       });
 
-      if (subscription) {
+      if (!subscription) {
         throw new BadRequestError("No active subscription found");
       }
 
-      const plan = (subscription as Stripe.Subscription & { plan: Stripe.Plan })
-        .plan as Stripe.Plan & { product: Stripe.Product };
+      const plan = (subscription as SubscriptionWithPlan).plan;
 
       return {
         subscription: plan,
