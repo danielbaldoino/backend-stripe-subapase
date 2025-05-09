@@ -19,12 +19,11 @@ export async function activeSubscription(app: FastifyTypedInstance) {
           200: z.object({
             subscription: z.object({
               id: z.string(),
-              amount: z.number().nullable(),
-              currency: z.string(),
-              interval: z.enum(["day", "week", "month", "year"]),
-              product: z.object({
+              plan: z.object({
                 id: z.string(),
-                name: z.string(),
+                amount: z.number().nullable(),
+                currency: z.string(),
+                interval: z.enum(["day", "week", "month", "year"]),
               }),
             }),
           }),
@@ -46,10 +45,8 @@ export async function activeSubscription(app: FastifyTypedInstance) {
       if (!subscription)
         throw new BadRequestError("No active subscription found");
 
-      const plan = (subscription as SubscriptionWithPlan).plan;
-
       return {
-        subscription: plan,
+        subscription: subscription as SubscriptionWithPlan,
       };
     }
   );
