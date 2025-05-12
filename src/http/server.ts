@@ -9,6 +9,7 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
+import { errorHandler } from "./error-handler";
 import { activeSubscription } from "./routes/active-subscription";
 import { billingPortalSession } from "./routes/billing-portal-session";
 import { createCheckoutSession } from "./routes/create-checkout-session";
@@ -20,6 +21,7 @@ const app = fastify().withTypeProvider<ZodTypeProvider>();
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+app.setErrorHandler(errorHandler);
 
 app.register(fastifyCors, { origin: "*" });
 
