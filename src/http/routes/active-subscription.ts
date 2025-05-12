@@ -31,7 +31,9 @@ export async function activeSubscription(app: FastifyTypedInstance) {
       },
     },
     async (request) => {
-      const { customerId } = await request.getAuthenticatedUser();
+      const { customerId } = await request.getAuthenticatedUser({
+        requireCustomerId: true,
+      });
 
       const {
         data: [subscription],

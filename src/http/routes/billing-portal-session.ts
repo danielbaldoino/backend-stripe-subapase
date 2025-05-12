@@ -2,7 +2,6 @@ import z from "zod";
 import { stripe } from "../../lib/services/stripe";
 import { FastifyTypedInstance } from "../../types";
 import { auth } from "../middlewares/auth";
-import { BadRequestError } from "./_errors/bad-request-error";
 
 export async function billingPortalSession(app: FastifyTypedInstance) {
   app.register(auth).get(
@@ -18,12 +17,12 @@ export async function billingPortalSession(app: FastifyTypedInstance) {
       },
     },
     async (request) => {
-      const { customerId } = await request.getAuthenticatedUser();
-
-      if (!customerId) throw new BadRequestError("Customer ID not found");
+      const { customerId } = await request.getAuthenticatedUser({
+        requireCustomerId: true,
+      });
 
       const session = await stripe.billingPortal.sessions.create({
-        customer: customerId,
+        customer: customerId!,
       });
 
       return {

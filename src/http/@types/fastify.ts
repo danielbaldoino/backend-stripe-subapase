@@ -2,7 +2,11 @@ import "fastify";
 
 declare module "fastify" {
   export interface FastifyRequest {
-    getAuthenticatedUser(): Promise<{
+    getAuthenticatedUser({
+      requireCustomerId,
+    }?: {
+      requireCustomerId?: boolean;
+    }): Promise<{
       userId: string;
       email: string;
       customerId?: string;

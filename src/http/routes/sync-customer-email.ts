@@ -16,16 +16,16 @@ export async function syncCustomerEmail(app: FastifyTypedInstance) {
       },
     },
     async (request, reply) => {
-      const { email, customerId } = await request.getAuthenticatedUser();
+      const { email, customerId } = await request.getAuthenticatedUser({
+        requireCustomerId: true,
+      });
 
-      if (customerId) {
-        const customer = await stripe.customers.update(customerId, {
-          email,
-        });
+      const customer = await stripe.customers.update(customerId!, {
+        email,
+      });
 
-        if (!customer)
-          throw new BadRequestError("Failed to update customer email");
-      } else throw new BadRequestError("Customer ID not found");
+      if (!customer)
+        throw new BadRequestError("Failed to update customer email");
 
       return reply.status(204).send();
     }
