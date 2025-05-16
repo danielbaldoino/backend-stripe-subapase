@@ -20,7 +20,7 @@ export async function syncCustomerEmail(app: FastifyTypedInstance) {
         requireCustomerId: true,
       });
 
-      const customer = await stripe.customers.update(customerId!, {
+      const customer = await stripe.customers.update(customerId, {
         email,
       });
 

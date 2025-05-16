@@ -3,12 +3,18 @@ import { fastifyPlugin } from "fastify-plugin";
 
 import { getCustomerIdByUserId } from "../../lib/db/repository";
 import { supabase } from "../../lib/services/supabase";
+import {
+  AuthenticatedUser,
+  GetAuthenticatedUserOptions,
+} from "../@types/fastify";
 import { BadRequestError } from "../routes/_errors/bad-request-error";
 import { UnauthorizedError } from "../routes/_errors/unauthorized-error";
 
 export const auth = fastifyPlugin(async (app: FastifyInstance) => {
   app.addHook("preHandler", async (request) => {
-    request.getAuthenticatedUser = async ({ requireCustomerId } = {}) => {
+    request.getAuthenticatedUser = async <T extends boolean>(
+      options: GetAuthenticatedUserOptions<T> = {}
+    ) => {
       const authHeader = request.headers.authorization;
 
       if (!authHeader || !authHeader.startsWith("Bearer "))
@@ -24,16 +30,15 @@ export const auth = fastifyPlugin(async (app: FastifyInstance) => {
       if (error || !user)
         throw new UnauthorizedError("Invalid or expired token");
 
-      const customerId = await getCustomerIdByUserId(user.id);
+      const { id: userId, email } = user;
+      const customerId = await getCustomerIdByUserId(userId);
 
-      if (requireCustomerId && !customerId)
-        throw new BadRequestError("No customer ID found");
+      if (options.requireCustomerId && !customerId)
+        throw new BadRequestError(
+          "User has no associated customer ID. Please complete the registration process."
+        );
 
-      return {
-        userId: user.id,
-        email: user.email as string,
-        customerId,
-      };
+      return { userId, email, customerId } as AuthenticatedUser<T>;
     };
   });
 });

@@ -22,7 +22,7 @@ export async function billingPortalSession(app: FastifyTypedInstance) {
       });
 
       const session = await stripe.billingPortal.sessions.create({
-        customer: customerId!,
+        customer: customerId,
       });
 
       return {
