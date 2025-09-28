@@ -1,5 +1,5 @@
 {
-  "name": "backend-stripe-subapase",
+  "name": "backend-stripe-supabase",
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/http/server.ts",
